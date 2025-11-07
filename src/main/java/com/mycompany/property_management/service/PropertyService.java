@@ -77,8 +77,6 @@ public class PropertyService {
            PropertyEntity newEntity = entity.get();
            newEntity.setTitle(property.getTitle());
            newEntity.setDescription(property.getDescription());
-           newEntity.setOwnerName(property.getOwnerName());
-           newEntity.setOwnerEmail(property.getOwnerEmail());
            newEntity.setPrice(property.getPrice());
            newEntity.setAddress(property.getAddress());
            propertyRepo.save(newEntity);
