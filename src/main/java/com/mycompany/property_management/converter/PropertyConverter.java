@@ -4,8 +4,6 @@ import com.mycompany.property_management.entity.PropertyEntity;
 import com.mycompany.property_management.model.PropertyDto;
 import org.springframework.stereotype.Component;
 
-import java.util.Optional;
-
 @Component
 public class PropertyConverter {
 

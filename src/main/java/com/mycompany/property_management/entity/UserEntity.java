@@ -17,10 +17,10 @@ public class UserEntity {
     @Column(name ="Owner_Email", length = 30, nullable = false, unique = true)
     private String ownerEmail;
 
-    @Column(name ="Phone_Number", length = 10, nullable = false, unique = true)
+    @Column(name ="Phone_Number", length = 10, nullable = false)
     private String phone;
 
-    @Column(name ="Owner_Password", length = 20, nullable = false)
+    @Column(name ="Owner_Password", nullable = false)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 

@@ -26,22 +26,6 @@ public class PropertyDto {
         this.description = description;
     }
 
-    public String getOwnerName() {
-        return ownerName;
-    }
-
-    public void setOwnerName(String ownerName) {
-        this.ownerName = ownerName;
-    }
-
-    public String getOwnerEmail() {
-        return ownerEmail;
-    }
-
-    public void setOwnerEmail(String ownerEmail) {
-        this.ownerEmail = ownerEmail;
-    }
-
     public Double getPrice() {
         return price;
     }

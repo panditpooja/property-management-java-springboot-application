@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class PropertyManagementApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(PropertyManagementApplication.class, args);
+        SpringApplication.run(PropertyManagementApplication.class, args);
 	}
 
 }
