@@ -2,6 +2,9 @@ package com.mycompany.property_management.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -9,8 +12,13 @@ public class UserDto {
 
     private String id;
     private String ownerName;
+    @NotNull(message = "Owner email is mandatory")
+    @NotEmpty(message = "Owner email cannot be empty")
+    @Size(min = 1, max = 50, message = "Owner Email should be between 1 to 50 characters.")
     private String ownerEmail;
     private String phone;
+    @NotNull(message = "Password cannot be null")
+    @NotEmpty(message = "Password cannot be empty")
     private String password;
 
     public void setId(String id) {
