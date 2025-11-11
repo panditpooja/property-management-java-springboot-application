@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <property name="LOG_PATH" value="logs" />
+    <property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %-40logger{39} : %msg%n" />
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/my-app.log</file>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>logs/archived/my-app.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <!-- each archived file, size max 10 MB, otherwise create a new file-->
+            <maxFileSize>10MB</maxFileSize>
+            <!-- 30 days to keep-->
+            <maxHistory>30</maxHistory>
+            <!-- Total size of all archived files,
+            if total size > 1GB it will delete the old archived files -->
+            <totalSizeCap>1GB</totalSizeCap>
+        </rollingPolicy>
+    </appender>
+
+    <logger name="org.springframework.web" level="WARN" />
+    <logger name="com.mycompany.property_management" level="INFO" />
+
+    <springProfile name="local, default">
+        <root level="INFO"> <appender-ref ref="CONSOLE" />
+        </root>
+        <logger name="org.hibernate" level="WARN" />
+    </springProfile>
+
+    <springProfile name="dev">
+        <root level="INFO"> <appender-ref ref="FILE" />
+        </root>
+        <logger name="org.hibernate" level="WARN" />
+    </springProfile>
+
+    <springProfile name="prod,acc,test">
+        <root level="WARN"> <appender-ref ref="FILE" />
+        </root>
+        <logger name="org.hibernate" level="ERROR" />
+    </springProfile>
+
+</configuration>
