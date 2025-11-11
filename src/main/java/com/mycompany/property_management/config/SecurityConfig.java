@@ -39,7 +39,7 @@ public class SecurityConfig {
 
                         // OR... if you want to allow all your API endpoints for testing:
                         .requestMatchers("/api/v1/**").permitAll() // Allows everything under /api/v1/
-//                        .anyRequest().permitAll() // Allow all other requests (like root)
+                        .anyRequest().permitAll() // Allow all other requests (like root)
                 );
 //                // --- THIS IS THE NEW PART ---
 //

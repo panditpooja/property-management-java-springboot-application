@@ -3,6 +3,10 @@ package com.mycompany.property_management.controller;
 import com.mycompany.property_management.model.PropertiesDto;
 import com.mycompany.property_management.model.PropertyDto;
 import com.mycompany.property_management.service.PropertyService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +21,14 @@ public class PropertyController {
     @Autowired
     private PropertyService propertyService;
 
+    @Operation(
+            summary = "Add a new property",
+            description = "Creates a new property record in the database. The user must be authenticated to use this."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Property created successfully"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized - user is not logged in")
+    })
     @PostMapping("/addProperty")
     public ResponseEntity<PropertyDto> addProperty(@RequestBody PropertyDto property) {
         PropertyDto savedProperty = propertyService.createProperty(property);
@@ -64,7 +76,10 @@ public class PropertyController {
     }
 
     @GetMapping(path = "/search", params = {"minPrice", "maxPrice"})
-    public ResponseEntity<PropertiesDto> searchByPriceRange (@RequestParam("minPrice") Double minPrice, @RequestParam("maxPrice") Double maxPrice){
+    public ResponseEntity<PropertiesDto> searchByPriceRange (@Parameter(description = "The minimum price of the property", example = "30000")
+                                                                 @RequestParam("minPrice") Double minPrice,
+                                                             @Parameter(description = "The maximum price of the property", example = "100000")
+                                                             @RequestParam("maxPrice") Double maxPrice){
         PropertiesDto propertiesDto = propertyService.searchByPriceRange(minPrice,maxPrice);
         return new ResponseEntity<>(propertiesDto, HttpStatus.OK);
     }
