@@ -1,0 +1,12 @@
+Swagger API links:
+http://localhost:8089/v3/api-docs
+
+Swagger UI:
+http://localhost:8089/swagger-ui.html
+
+Spring boot actuator documentation:
+https://docs.spring.io/spring-boot/reference/actuator/endpoints.html
+
+There are multiple metrics that can be viewed by following the above documentation.
+Eg: -> http://localhost:8089/actuator/health
+-> http://localhost:8089/actuator/metrics
