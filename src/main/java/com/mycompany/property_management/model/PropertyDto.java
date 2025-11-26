@@ -5,10 +5,17 @@ public class PropertyDto {
     private Long id;
     private String title;
     private String description;
-    private String ownerName;
-    private String ownerEmail;
     private Double price;
     private String address;
+    private String userId;
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
 
     public String getTitle() {
         return title;

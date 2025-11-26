@@ -22,6 +22,19 @@ public class PropertyEntity {
     @Column(name = "Address", length = 20, nullable = false)
     private String address;
 
+    @ManyToOne(fetch = FetchType.LAZY) //It will not fetch the user data while fetching the properties
+//    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "USER_ID", nullable = false)
+    private UserEntity userEntity;
+
+    public UserEntity getUserEntity() {
+        return userEntity;
+    }
+
+    public void setUserEntity(UserEntity userEntity) {
+        this.userEntity = userEntity;
+    }
+
     public String getTitle() {
         return title;
     }

@@ -2,9 +2,13 @@ package com.mycompany.property_management.service;
 
 import com.mycompany.property_management.converter.PropertyConverter;
 import com.mycompany.property_management.entity.PropertyEntity;
+import com.mycompany.property_management.entity.UserEntity;
+import com.mycompany.property_management.exception.BusinessException;
+import com.mycompany.property_management.exception.ErrorModel;
 import com.mycompany.property_management.model.PropertiesDto;
 import com.mycompany.property_management.model.PropertyDto;
 import com.mycompany.property_management.repository.PropertyRepository;
+import com.mycompany.property_management.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,12 +25,26 @@ public class PropertyService {
     @Autowired
     private PropertyConverter propertyConverter;
 
-    public PropertyDto createProperty(PropertyDto property){
+    @Autowired
+    private UserRepository userRepo;
 
-        PropertyEntity propertyEntity = propertyConverter.convertModelToEntity(property);
-        propertyRepo.save(propertyEntity);
-        property.setId(propertyEntity.getId());
-        return property;
+    public PropertyDto createProperty(PropertyDto property){
+        Optional<UserEntity> userEntity = userRepo.findById(property.getUserId());
+        if (userEntity.isPresent()){
+            PropertyEntity propertyEntity = propertyConverter.convertModelToEntity(property);
+            propertyEntity.setUserEntity(userEntity.get());
+            propertyEntity = propertyRepo.save(propertyEntity);
+            property.setId(propertyEntity.getId());
+            return property;
+        }
+        List<ErrorModel> errors = new ArrayList<>();
+        ErrorModel error = new ErrorModel();
+        error.setCode("NON_EXISTING_USER_ID");
+        error.setMessage("Entered User id is not present.");
+        errors.add(error);
+        throw new BusinessException(errors);
+
+
 
     }
 
@@ -49,6 +67,16 @@ public class PropertyService {
     public List<PropertyDto> getAllProperties(){
         PropertiesDto allPropertiesDto = new PropertiesDto();
         List<PropertyEntity> entities = propertyRepo.findAll();
+        for (PropertyEntity entity : entities){
+            PropertyDto property = propertyConverter.convertEntityToModel(entity);
+            allPropertiesDto.getProperties().add(property);
+        }
+        return allPropertiesDto.getProperties();
+    }
+
+    public List<PropertyDto> getAllPropertiesUsers(String userId){
+        PropertiesDto allPropertiesDto = new PropertiesDto();
+        List<PropertyEntity> entities = propertyRepo.findAllByUserEntityId(userId);
         for (PropertyEntity entity : entities){
             PropertyDto property = propertyConverter.convertEntityToModel(entity);
             allPropertiesDto.getProperties().add(property);

@@ -25,8 +25,6 @@ public class CustomExceptionHandler {
             logger.warn("Business Exception is thrown level-warn {} - {} ",em.getCode(), em.getMessage());
             logger.error("Business Exception is thrown - level-error {} - {} ",em.getCode(), em.getMessage());
         }
-        logger.debug("Business Exception is thrown. {} ",bex.getErrors());
-        logger.info("Business Exception is thrown. {} ",bex.getErrors());
         return new ResponseEntity<List<ErrorModel>>(bex.getErrors(), HttpStatus.BAD_REQUEST);
     }
 

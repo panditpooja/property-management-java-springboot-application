@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -26,6 +27,15 @@ public class SecurityConfig {
         http
                 // 1. Disable CSRF (common for stateless REST APIs)
                 .csrf(csrf -> csrf.disable())
+
+//                // 1. Disable CSRF for h2-console
+//                .csrf(csrf -> csrf
+//                        .ignoringRequestMatchers(new AntPathRequestMatcher("/h2-console/**"))
+//                )
+                // 2. Allow frames for h2-console (Same Origin)
+                .headers(headers -> headers
+                        .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
+                )
 
                 // 2. Define authorization rules
                 .authorizeHttpRequests(authz -> authz
