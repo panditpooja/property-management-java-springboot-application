@@ -21,6 +21,12 @@ public class UserDto {
     @NotEmpty(message = "Password cannot be empty")
     private String password;
 
+//    Address Fields
+    private String houseNo;
+    private String street;
+    private String postalCode;
+    private String country;
+
     public void setId(String id) {
         this.id = id;
     }
@@ -59,5 +65,37 @@ public class UserDto {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getHouseNo() {
+        return houseNo;
+    }
+
+    public void setHouseNo(String houseNo) {
+        this.houseNo = houseNo;
+    }
+
+    public String getStreet() {
+        return street;
+    }
+
+    public void setStreet(String street) {
+        this.street = street;
+    }
+
+    public String getPostalCode() {
+        return postalCode;
+    }
+
+    public void setPostalCode(String postalCode) {
+        this.postalCode = postalCode;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
     }
 }

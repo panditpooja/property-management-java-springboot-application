@@ -26,6 +26,14 @@ public class AddressEntity {
     @JoinColumn(name = "USER_ID", nullable = false)
     private UserEntity userEntity;
 
+    public UserEntity getUserEntity() {
+        return userEntity;
+    }
+
+    public void setUserEntity(UserEntity userEntity) {
+        this.userEntity = userEntity;
+    }
+
     public Long getId() {
         return id;
     }

@@ -1,11 +1,13 @@
 package com.mycompany.property_management.service;
 
 //import com.mycompany.property_management.config.JwtTokenUtil;
+import com.mycompany.property_management.entity.AddressEntity;
 import com.mycompany.property_management.entity.UserEntity;
 import com.mycompany.property_management.exception.BusinessException;
 import com.mycompany.property_management.exception.ErrorModel;
 import com.mycompany.property_management.model.UserDto;
 import com.mycompany.property_management.converter.UserConverter;
+import com.mycompany.property_management.repository.AddressRepository;
 import com.mycompany.property_management.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,14 +29,24 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private AddressRepository addressRepo;
+
 //    @Autowired
 //    private JwtTokenUtil jwtTokenUtil;
 
     public UserDto registerUser(UserDto user){
-        UserEntity entity = userConverter.convertModelToEntity(user);
-        Optional<UserEntity> userExists = userRepo.findByOwnerEmail(entity.getOwnerEmail());
+        Optional<UserEntity> userExists = userRepo.findByOwnerEmail(user.getOwnerEmail());
         if (userExists.isEmpty()) {
+            AddressEntity addressEntity = new AddressEntity();
+            UserEntity entity = userConverter.convertModelToEntity(user);
+            addressEntity.setHouseNo(user.getHouseNo());
+            addressEntity.setStreet(user.getStreet());
+            addressEntity.setPostalCode(user.getPostalCode());
+            addressEntity.setCountry(user.getCountry());
             entity = userRepo.save(entity);
+            addressEntity.setUserEntity(entity);
+            addressRepo.save(addressEntity);
             user = userConverter.convertEntityToModel(entity);
             return user;
         }
