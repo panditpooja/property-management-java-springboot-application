@@ -28,10 +28,6 @@ public class SecurityConfig {
                 // 1. Disable CSRF (common for stateless REST APIs)
                 .csrf(csrf -> csrf.disable())
 
-//                // 1. Disable CSRF for h2-console
-//                .csrf(csrf -> csrf
-//                        .ignoringRequestMatchers(new AntPathRequestMatcher("/h2-console/**"))
-//                )
                 // 2. Allow frames for h2-console (Same Origin)
                 .headers(headers -> headers
                         .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)

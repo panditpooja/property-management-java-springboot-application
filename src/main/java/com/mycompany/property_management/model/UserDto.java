@@ -2,6 +2,7 @@ package com.mycompany.property_management.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.mycompany.property_management.entity.Role;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -20,6 +21,7 @@ public class UserDto {
     @NotNull(message = "Password cannot be null")
     @NotEmpty(message = "Password cannot be empty")
     private String password;
+    private Role role;
 
 //    Address Fields
     private String houseNo;
@@ -97,5 +99,13 @@ public class UserDto {
 
     public void setCountry(String country) {
         this.country = country;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
     }
 }

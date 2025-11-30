@@ -3,6 +3,9 @@ package com.mycompany.property_management.entity;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "User_Table")
 public class UserEntity {
@@ -24,8 +27,23 @@ public class UserEntity {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
+    @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
+    @Enumerated(EnumType.STRING)
+    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "role")
+    private List<Role> roles = new ArrayList<>(List.of(Role.USER)); // Default role is USER
+
+
     public String getId() {
         return id;
+    }
+
+    public List<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<Role> roles) {
+        this.roles = roles;
     }
 
     public void setId(String id) {
