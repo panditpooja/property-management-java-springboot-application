@@ -37,10 +37,10 @@ public class JwtTokenUtil {
     /**
      * Generates a new JWT token for a given username.
      */
-    public String generateToken(String username, List<String> roles) {
+    public String generateToken(String email, List<String> roles) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("roles", roles); // Add roles to the token
-        return doGenerateToken(claims, username);
+        return doGenerateToken(claims, email);
     }
 
     /**

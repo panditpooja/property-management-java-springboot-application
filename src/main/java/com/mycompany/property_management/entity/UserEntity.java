@@ -31,7 +31,7 @@ public class UserEntity {
     @Enumerated(EnumType.STRING)
     @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
     @Column(name = "role")
-    private List<Role> roles = new ArrayList<>(List.of(Role.USER)); // Default role is USER
+    private List<Role> roles;
 
 
     public String getId() {

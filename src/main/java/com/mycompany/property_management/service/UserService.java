@@ -1,7 +1,8 @@
 package com.mycompany.property_management.service;
 
-//import com.mycompany.property_management.config.JwtTokenUtil;
+import com.mycompany.property_management.config.JwtTokenUtil;
 import com.mycompany.property_management.entity.AddressEntity;
+import com.mycompany.property_management.entity.Role;
 import com.mycompany.property_management.entity.UserEntity;
 import com.mycompany.property_management.exception.BusinessException;
 import com.mycompany.property_management.exception.ErrorModel;
@@ -32,14 +33,24 @@ public class UserService {
     @Autowired
     private AddressRepository addressRepo;
 
-//    @Autowired
-//    private JwtTokenUtil jwtTokenUtil;
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
 
     public UserDto registerUser(UserDto user){
         Optional<UserEntity> userExists = userRepo.findByOwnerEmail(user.getOwnerEmail());
         if (userExists.isEmpty()) {
             AddressEntity addressEntity = new AddressEntity();
             UserEntity entity = userConverter.convertModelToEntity(user);
+
+            // Set default roles if not provided
+            if (user.getRoles() == null || user.getRoles().isEmpty()) {
+                // Default to USER role only
+                entity.setRoles(new ArrayList<>(List.of(Role.USER)));
+            } else {
+                // Use provided roles (e.g., ["USER", "PROPERTY_OWNER"])
+                entity.setRoles(user.getRoles());
+            }
+
             addressEntity.setHouseNo(user.getHouseNo());
             addressEntity.setStreet(user.getStreet());
             addressEntity.setPostalCode(user.getPostalCode());
@@ -66,10 +77,15 @@ public class UserService {
                 UserEntity user = entity.get();
                 String storedHashedPassword = user.getPassword();
 
-                // 3. SECURELY check if the plain-text password matches the stored hash
+                // SECURELY check if the plain-text password matches the stored hash
                 if (passwordEncoder.matches(password, storedHashedPassword)) {
-                    return "User Logged In successfully";
-//                    return jwtTokenUtil.generateToken(user.getOwnerEmail());
+                    // Generate JWT token with user's roles
+                    // Note: user.getRoles() returns List<Role> (enum objects), but we need List<String>
+                    // So we convert Role.USER → "USER", Role.ADMIN → "ADMIN", etc.
+                    List<String> roleNames = user.getRoles().stream()
+                            .map(Role::name)
+                            .collect(java.util.stream.Collectors.toList());
+                    return jwtTokenUtil.generateToken(email, roleNames);
                 }
             }
             List<ErrorModel> errors = new ArrayList<>();
@@ -88,5 +104,4 @@ public class UserService {
             throw new BusinessException(errors);
         }
     }
-
 }

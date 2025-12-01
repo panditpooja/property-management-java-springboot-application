@@ -1,21 +1,26 @@
 package com.mycompany.property_management.config;
 
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 
-//    @Autowired
-//    private JwtRequestFilter jwtRequestFilter;
+    @Autowired
+    private JwtRequestFilter jwtRequestFilter;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -33,30 +38,44 @@ public class SecurityConfig {
                         .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
                 )
 
-                // 2. Define authorization rules
+                // 3. Define authorization rules
                 .authorizeHttpRequests(authz -> authz
-                        // Allow your login and registration endpoints to be public
-                        .requestMatchers("/api/v1/users/register", "/api/v1/users/login").permitAll()
+                        // Public endpoints - no authentication required
+                        .requestMatchers("/api/v1/users/registerUser", "/api/v1/users/loginUser").permitAll()
 
-//                        .requestMatchers("/api/v1/properties/addProperty", "/api/v1/properties/addProperties").authenticated()
+                        // Admin only endpoints
+                        .requestMatchers("/api/v1/properties/updateProperties/**").hasRole("ADMIN")
 
-                                // Secure all other endpoints (for now)
-                                // .anyRequest().authenticated()
+                        // Property Owner and Admin can add properties
+                        .requestMatchers("/api/v1/properties/addProperty", "/api/v1/properties/addProperties")
+                        .hasAnyRole("ADMIN", "PROPERTY_OWNER")
 
-                        // OR... if you want to allow all your API endpoints for testing:
-                        .requestMatchers("/api/v1/**").permitAll() // Allows everything under /api/v1/
-                        .anyRequest().permitAll() // Allow all other requests (like root)
-                );
-//                // --- THIS IS THE NEW PART ---
-//
-//                // 4. Make the session stateless (no cookies)
-//                    .sessionManagement(session -> session
-//                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-//                )
-//
-//                // 5. Tell Spring to use your JWT filter
-//                // This runs YOUR filter before Spring's default login page filter
-//                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+                        // Property Owner and Admin can delete properties
+                        .requestMatchers("/api/v1/properties/deleteProperty/**")
+                        .hasAnyRole("ADMIN", "PROPERTY_OWNER")
+
+                        // All authenticated users can view and search properties
+                        // (Ownership checks for /getProperties/users/** are handled in PropertyService)
+                        .requestMatchers("/api/v1/properties/getProperties",
+                                "/api/v1/properties/getProperty/**",
+                                "/api/v1/properties/getProperties/users/**",
+                                "/api/v1/properties/search/**").authenticated()
+
+                        // All other API endpoints require authentication
+                        .requestMatchers("/api/v1/**").authenticated()
+
+                        // Allow all other requests (like Swagger UI, h2-console)
+                        .anyRequest().permitAll()
+                )
+
+                // 4. Make the session stateless (no cookies, JWT only)
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+
+                // 5. Tell Spring to use your JWT filter
+                // This runs YOUR filter before Spring's default login page filter
+                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

@@ -10,6 +10,8 @@ import com.mycompany.property_management.model.PropertyDto;
 import com.mycompany.property_management.repository.PropertyRepository;
 import com.mycompany.property_management.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -28,8 +30,62 @@ public class PropertyService {
     @Autowired
     private UserRepository userRepo;
 
+//    Helper methods
+    private String getCurrentUserEmail() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()) {
+            return authentication.getName(); // Returns the email (username)
+        }
+        return null;
+    }
+
+    private boolean isAdmin() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null) {
+            return authentication.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        }
+        return false;
+    }
+
+    private boolean hasPropertyOwnerRole() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null) {
+            return authentication.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_PROPERTY_OWNER"));
+        }
+        return false;
+    }
+
     public PropertyDto createProperty(PropertyDto property){
-        Optional<UserEntity> userEntity = userRepo.findById(property.getUserId());
+        String currentUserEmail = getCurrentUserEmail();
+        Optional<UserEntity> userEntity;
+
+        // Admin can create properties for any user, Property Owner can only create for themselves
+        if (isAdmin()) {
+            userEntity = userRepo.findById(property.getUserId());
+        } else if (hasPropertyOwnerRole()) {
+            // Property Owner must use their own user ID
+            Optional<UserEntity> currentUser = userRepo.findByOwnerEmail(currentUserEmail);
+            if (currentUser.isEmpty() || !currentUser.get().getId().equals(property.getUserId())) {
+                List<ErrorModel> errors = new ArrayList<>();
+                ErrorModel error = new ErrorModel();
+                error.setCode("UNAUTHORIZED");
+                error.setMessage("You can only add properties for yourself");
+                errors.add(error);
+                throw new BusinessException(errors);
+            }
+            userEntity = userRepo.findById(property.getUserId());
+        } else {
+            // User role cannot create properties
+            List<ErrorModel> errors = new ArrayList<>();
+            ErrorModel error = new ErrorModel();
+            error.setCode("UNAUTHORIZED");
+            error.setMessage("You need PROPERTY_OWNER or ADMIN role to add properties");
+            errors.add(error);
+            throw new BusinessException(errors);
+        }
+
         if (userEntity.isPresent()){
             PropertyEntity propertyEntity = propertyConverter.convertModelToEntity(property);
             propertyEntity.setUserEntity(userEntity.get());
@@ -43,9 +99,6 @@ public class PropertyService {
         error.setMessage("Entered User id is not present.");
         errors.add(error);
         throw new BusinessException(errors);
-
-
-
     }
 
     public List<PropertyDto> createProperties(List<PropertyDto> properties){
@@ -75,6 +128,21 @@ public class PropertyService {
     }
 
     public List<PropertyDto> getAllPropertiesUsers(String userId){
+        String currentUserEmail = getCurrentUserEmail();
+        Optional<UserEntity> currentUser = userRepo.findByOwnerEmail(currentUserEmail);
+
+        // Admin can view any user's properties, Property Owner can only view their own
+        if (!isAdmin()) {
+            if (currentUser.isEmpty() || !currentUser.get().getId().equals(userId)) {
+                List<ErrorModel> errors = new ArrayList<>();
+                ErrorModel error = new ErrorModel();
+                error.setCode("UNAUTHORIZED");
+                error.setMessage("You can only view your own properties");
+                errors.add(error);
+                throw new BusinessException(errors);
+            }
+        }
+
         PropertiesDto allPropertiesDto = new PropertiesDto();
         List<PropertyEntity> entities = propertyRepo.findAllByUserEntityId(userId);
         for (PropertyEntity entity : entities){
@@ -117,6 +185,33 @@ public class PropertyService {
     }
 
     public void deleteProperty(Long id){
+        Optional<PropertyEntity> propertyOpt = propertyRepo.findById(id);
+        if (propertyOpt.isEmpty()) {
+            List<ErrorModel> errors = new ArrayList<>();
+            ErrorModel error = new ErrorModel();
+            error.setCode("PROPERTY_NOT_FOUND");
+            error.setMessage("Property not found");
+            errors.add(error);
+            throw new BusinessException(errors);
+        }
+
+        PropertyEntity property = propertyOpt.get();
+        String currentUserEmail = getCurrentUserEmail();
+
+        // SecurityConfig already ensures only ADMIN or PROPERTY_OWNER can access this endpoint
+        // Here we just need to check: if property owner, they can only delete their own properties
+        // Admins can delete any property (no ownership check needed)
+        if (hasPropertyOwnerRole() && !property.getUserEntity().getOwnerEmail().equals(currentUserEmail)) {
+            // Property Owner trying to delete someone else's property - not allowed
+            List<ErrorModel> errors = new ArrayList<>();
+            ErrorModel error = new ErrorModel();
+            error.setCode("UNAUTHORIZED");
+            error.setMessage("You can only delete your own properties.");
+            errors.add(error);
+            throw new BusinessException(errors);
+        }
+
+        // Admin or Property Owner deleting their own property - proceed
         propertyRepo.deleteById(id);
     }
 
