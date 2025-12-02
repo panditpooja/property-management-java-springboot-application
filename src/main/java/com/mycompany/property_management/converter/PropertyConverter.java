@@ -13,9 +13,7 @@ public class PropertyConverter {
         propertyEntity.setDescription(property.getDescription());
         propertyEntity.setPrice(property.getPrice());
         propertyEntity.setAddress(property.getAddress());
-
         return propertyEntity;
-
     }
 
     public PropertyDto convertEntityToModel(PropertyEntity propertyEntity){
@@ -27,6 +25,5 @@ public class PropertyConverter {
         propertyDto.setId(propertyEntity.getId());
         propertyDto.setUserId(propertyEntity.getUserEntity().getId());
         return propertyDto;
-
     }
 }

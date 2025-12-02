@@ -18,8 +18,8 @@ public class UserConverter {
         userEntity.setOwnerEmail(user.getOwnerEmail());
         userEntity.setPhone(user.getPhone());
         userEntity.setPassword(passwordEncoder.encode(user.getPassword()));
+        userEntity.setRoles(user.getRoles());
         return userEntity;
-
     }
 
     public UserDto convertEntityToModel(UserEntity userEntity){
@@ -28,8 +28,7 @@ public class UserConverter {
         user.setOwnerName(userEntity.getOwnerName());
         user.setOwnerEmail(userEntity.getOwnerEmail());
         user.setPhone(userEntity.getPhone());
-//        user.setPassword(userEntity.getPassword());
+        user.setRoles(userEntity.getRoles());
         return user;
-
     }
 }

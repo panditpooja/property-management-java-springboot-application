@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,12 +30,14 @@ public class PropertyController {
             @ApiResponse(responseCode = "201", description = "Property created successfully"),
             @ApiResponse(responseCode = "401", description = "Unauthorized - user is not logged in")
     })
+    @PreAuthorize("hasAnyRole('ADMIN', 'PROPERTY_OWNER')")
     @PostMapping("/addProperty")
     public ResponseEntity<PropertyDto> addProperty(@RequestBody PropertyDto property) {
         PropertyDto savedProperty = propertyService.createProperty(property);
         return new ResponseEntity<PropertyDto>(savedProperty, HttpStatus.CREATED);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'PROPERTY_OWNER')")
     @PostMapping("/addProperties")
     public ResponseEntity<List<PropertyDto>> addProperties(@RequestBody List<PropertyDto> properties) {
         List<PropertyDto> savedProperties = propertyService.createProperties(properties);
@@ -63,6 +66,7 @@ public class PropertyController {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/updateProperties/{id}")
     public ResponseEntity<PropertyDto> updateProperties (@RequestBody PropertyDto propertyDto, @PathVariable("id") Long id){
         PropertyDto updatedProperty = propertyService.updateProperty(propertyDto,id);
