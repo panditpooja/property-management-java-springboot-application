@@ -17,7 +17,7 @@ public class UserEntity {
     @Column(name ="Owner_Name", length = 20, nullable = false)
     private String ownerName;
 
-    @Column(name ="Owner_Email", length = 30, nullable = false, unique = true)
+    @Column(name ="Owner_Email", length = 50, nullable = false, unique = true)
     private String ownerEmail;
 
     @Column(name ="Phone_Number", length = 10, nullable = false)
