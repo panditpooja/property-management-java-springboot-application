@@ -1,12 +1,28 @@
 package com.mycompany.property_management.model;
 
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
 public class PropertyDto {
 
     private Long id;
+    
+    @NotNull(message = "Property title is required")
+    @NotEmpty(message = "Property title cannot be empty")
+    @Size(max = 20, message = "Property title must be at most 20 characters")
     private String title;
+    
+    @Size(max = 40, message = "Property description must be at most 40 characters")
     private String description;
+    
+    @NotNull(message = "Property price is required")
     private Double price;
+    
+    @NotNull(message = "Property address is required")
+    @NotEmpty(message = "Property address cannot be empty")
     private String address;
+    
     private String userId;
 
     public String getUserId() {

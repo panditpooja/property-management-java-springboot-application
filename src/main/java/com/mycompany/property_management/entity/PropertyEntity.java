@@ -16,7 +16,7 @@ public class PropertyEntity {
     @Column(name = "Description", length = 40, nullable = true)
     private String description;
 
-    @Column(name = "Price", length = 20, nullable = false)
+    @Column(name = "Price", nullable = false)
     private Double price;
 
     @Column(name = "Address", length = 20, nullable = false)
