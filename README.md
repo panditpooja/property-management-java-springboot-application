@@ -2,23 +2,6 @@
 
 A comprehensive RESTful API for managing properties with JWT-based authentication and role-based access control (RBAC). Built with Spring Boot 3.5.7 and Java 17.
 
-## 📋 Table of Contents
-
-- [Features](#features)
-- [Technology Stack](#technology-stack)
-- [Prerequisites](#prerequisites)
-- [Installation & Setup](#installation--setup)
-- [Configuration](#configuration)
-- [API Documentation](#api-documentation)
-- [Authentication & Authorization](#authentication--authorization)
-- [Role-Based Access Control](#role-based-access-control)
-- [Project Structure](#project-structure)
-- [Running the Application](#running-the-application)
-- [Testing](#testing)
-- [Troubleshooting](#troubleshooting)
-- [Security Considerations](#security-considerations)
-- [Future Enhancements](#future-enhancements)
-
 ## ✨ Features
 
 - **User Management**
